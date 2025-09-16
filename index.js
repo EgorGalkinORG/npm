@@ -1,8 +1,6 @@
 const moment = require('moment');
 
-function getDate() {
-    const date = moment().format('YYYY/MM/DD HH:mm:ss');
-    console.log(date);
-}
+function getCurrentDay() {
+    console.log(moment().format('dddd'));
 
-getDate();
+getCurrentDay();
