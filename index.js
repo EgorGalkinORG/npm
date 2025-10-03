@@ -1,4 +1,5 @@
 const express = require('express');
+const fsA = require('fs/promises');
 const path = require('path');
 const fs = require('fs');
 const app = express();
@@ -48,6 +49,36 @@ app.get('/posts/:id', (req, res) => {
     res.json(post);
 });
 
+app.post('/posts', async (req, res) => {
+    try {
+        const { title, description, image } = req.body;
+
+        if (!title || !description || !image) {
+            return res.status(422).json({ error: "title, description и image обов`язкові" });
+        }
+
+        const dataPath = path.join(__dirname, 'posts.json');
+        let posts = JSON.parse(await fsA.readFile(dataPath, 'utf-8'));
+
+        const newPost = {
+            id: posts.length ? posts[posts.length - 1].id + 1 : 1,
+            // зверху жах😭
+            title,
+            description,
+            image
+        };
+
+        posts.push(newPost);
+
+        await fsA.writeFile(dataPath, JSON.stringify(posts, null, 2), 'utf-8');
+
+        res.status(201).json(newPost);
+    } catch (error) {
+        res.status(500).json({ error: "Ошибка при создании поста" });
+    }
+});
+
 app.listen(5000, () => {
     console.log(`Сервер запущен на http://localhost:5000`);
 });
+
