@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import PostService from "./service";
+import { CreatePostData, UpdatePostData } from "./post.types";
 
 const PostController = {
   async getAll(req: Request, res: Response) {
@@ -13,7 +14,7 @@ const PostController = {
 
   async getById(req: Request, res: Response) {
     try {
-      const id: number = +req.params.id;
+      const id = +req.params.id;
       if (isNaN(id)) {
         return res.status(400).json({ error: "id должен быть числом" });
       }
@@ -31,12 +32,18 @@ const PostController = {
 
   async create(req: Request, res: Response) {
     try {
-      const { title, description, image } = req.body;
+      const { title, description, image } = req.body as CreatePostData;
 
       if (!title || !description || !image) {
-        return res
-          .status(422)
-          .json({ error: "title, description и image обязательны" });
+        return res.status(422).json({ error: "title, description и image обязательны" });
+      }
+
+      if (
+        typeof title !== "string" ||
+        typeof description !== "string" ||
+        typeof image !== "string"
+      ) {
+        return res.status(400).json({ error: "Неверный тип данных" });
       }
 
       const newPost = await PostService.create({ title, description, image });
@@ -44,6 +51,36 @@ const PostController = {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Ошибка при создании поста" });
+    }
+  },
+
+  async update(req: Request, res: Response) {
+    try {
+      const id = +req.params.id;
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "id должен быть числом" });
+      }
+
+      const { title, description, image } = req.body as UpdatePostData;
+
+      if (title && typeof title !== "string") {
+        return res.status(400).json({ error: "title должен быть строкой" });
+      }
+      if (description && typeof description !== "string") {
+        return res.status(400).json({ error: "description должен быть строкой" });
+      }
+      if (image && typeof image !== "string") {
+        return res.status(400).json({ error: "image должен быть строкой" });
+      }
+
+      const updatedPost = await PostService.update(id, { title, description, image });
+      res.json(updatedPost);
+    } catch (err: any) {
+      console.error(err);
+      if (err.message === "Пост не найден") {
+        return res.status(404).json({ error: err.message });
+      }
+      res.status(500).json({ error: "Ошибка при обновлении поста" });
     }
   },
 };
