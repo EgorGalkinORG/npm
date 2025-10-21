@@ -1,21 +1,21 @@
 import { promises as fs } from "fs";
-import { Post, CreatePostData, UpdatePostData } from "./post.types";
+import { Post, CreatePostData, UpdatePostData, IPostService } from "./post.types";
 
 const FILE_PATH = "./src/posts.json";
 
-const PostService = {
-  async getAll(): Promise<Post[]> {
+const PostService: IPostService = {
+  async getAll() {
     const data = await fs.readFile(FILE_PATH, "utf-8");
     return JSON.parse(data) as Post[];
   },
 
-  async getById(id: number): Promise<Post | undefined> {
+  async getById(id) {
     const data = await fs.readFile(FILE_PATH, "utf-8");
     const posts: Post[] = JSON.parse(data);
     return posts.find((p) => p.id === id);
   },
 
-  async create(postData: CreatePostData) {
+  async create(postData) {
     const data = await fs.readFile(FILE_PATH, "utf-8");
     const posts: Post[] = JSON.parse(data);
 
@@ -30,17 +30,14 @@ const PostService = {
     return newPost;
   },
 
-  async update(id: number, updateData: UpdatePostData) {
+  async update(id, updateData) {
     const data = await fs.readFile(FILE_PATH, "utf-8");
     const posts: Post[] = JSON.parse(data);
     const index = posts.findIndex((p) => p.id === id);
 
-    if (index === -1) {
-      throw new Error("Пост не найден");
-    }
+    if (index === -1) throw new Error("Пост не найден");
 
     posts[index] = { ...posts[index], ...updateData };
-
     await fs.writeFile(FILE_PATH, JSON.stringify(posts, null, 2));
 
     return posts[index];

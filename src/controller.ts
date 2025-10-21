@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import PostService from "./service";
-import { CreatePostData, UpdatePostData } from "./post.types";
+import { IPostController, UpdatePostData, CreatePostData } from "./post.types";
 
-const PostController = {
+const PostController: IPostController = {
   async getAll(req: Request, res: Response) {
     try {
       const posts = await PostService.getAll();
@@ -30,9 +30,9 @@ const PostController = {
     }
   },
 
-  async create(req: Request, res: Response) {
+  async create(req: Request<{}, {}, CreatePostData>, res: Response) {
     try {
-      const { title, description, image } = req.body as CreatePostData;
+      const { title, description, image } = req.body;
 
       if (!title || !description || !image) {
         return res.status(422).json({ error: "title, description и image обязательны" });
@@ -54,14 +54,14 @@ const PostController = {
     }
   },
 
-  async update(req: Request, res: Response) {
+  async update(req: Request<{ id: string }, {}, UpdatePostData>, res: Response) {
     try {
       const id = +req.params.id;
       if (isNaN(id)) {
         return res.status(400).json({ error: "id должен быть числом" });
       }
 
-      const { title, description, image } = req.body as UpdatePostData;
+      const { title, description, image } = req.body;
 
       if (title && typeof title !== "string") {
         return res.status(400).json({ error: "title должен быть строкой" });
@@ -76,7 +76,6 @@ const PostController = {
       const updatedPost = await PostService.update(id, { title, description, image });
       res.json(updatedPost);
     } catch (err: any) {
-      console.error(err);
       if (err.message === "Пост не найден") {
         return res.status(404).json({ error: err.message });
       }
