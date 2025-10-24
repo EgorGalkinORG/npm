@@ -1,46 +1,53 @@
-import { promises as fs } from "fs";
-import { Post, CreatePostData, UpdatePostData, IPostService } from "./post.types";
-
-const FILE_PATH = "./src/posts.json";
+import prisma from "../../prisma";
+import { IPostService, CreatePostChecked, UpdatePostChecked } from "./post.types";
 
 const PostService: IPostService = {
   async getAll() {
-    const data = await fs.readFile(FILE_PATH, "utf-8");
-    return JSON.parse(data) as Post[];
+    try {
+      return await prisma.post.findMany({
+        include: { tags: { include: { tag: true } } },
+      });
+    } catch (error) {
+      throw error;
+    }
   },
 
   async getById(id) {
-    const data = await fs.readFile(FILE_PATH, "utf-8");
-    const posts: Post[] = JSON.parse(data);
-    return posts.find((p) => p.id === id);
+    try {
+      return await prisma.post.findUnique({
+        where: { id },
+        include: { tags: { include: { tag: true } } },
+      });
+    } catch (error) {
+      throw error;
+    }
   },
 
-  async create(postData) {
-    const data = await fs.readFile(FILE_PATH, "utf-8");
-    const posts: Post[] = JSON.parse(data);
-
-    const newPost: Post = {
-      id: posts.length > 0 ? posts[posts.length - 1].id + 1 : 1,
-      ...postData,
-    };
-
-    posts.push(newPost);
-    await fs.writeFile(FILE_PATH, JSON.stringify(posts, null, 2));
-
-    return newPost;
+  async create(data: CreatePostChecked) {
+    try {
+      return await prisma.post.create({ data });
+    } catch (error) {
+      throw error;
+    }
   },
 
-  async update(id, updateData) {
-    const data = await fs.readFile(FILE_PATH, "utf-8");
-    const posts: Post[] = JSON.parse(data);
-    const index = posts.findIndex((p) => p.id === id);
+  async update(id: number, data: UpdatePostChecked) {
+    try {
+      return await prisma.post.update({ where: { id }, data });
+    } catch (error) {
+      throw error;
+    }
+  },
 
-    if (index === -1) throw new Error("Пост не найден");
-
-    posts[index] = { ...posts[index], ...updateData };
-    await fs.writeFile(FILE_PATH, JSON.stringify(posts, null, 2));
-
-    return posts[index];
+  async delete(id: number) {
+    try {
+      return await prisma.post.delete({ where: { id } });
+    } catch (error: any) {
+      if (error.code === "P2025") {
+        return null;
+      }
+      throw error;
+    }
   },
 };
 

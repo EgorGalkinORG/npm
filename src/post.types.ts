@@ -1,25 +1,30 @@
 import { Request, Response } from "express";
+import { Post as PrismaPost, Prisma } from "@prisma/client";
 
-export interface Post {
-  id: number;
-  title: string;
-  description: string;
-  image: string;
-}
+export type Post = PrismaPost;
 
-export type CreatePostData = Omit<Post, "id">;
-export type UpdatePostData = Partial<Omit<Post, "id">>;
+export type PostWithTags = Prisma.PostGetPayload<{
+  include: { tags: { include: { tag: true } } };
+}>;
+
+export type CreatePost = Pick<Post, "title" | "description" | "image">;
+export type CreatePostChecked = Required<CreatePost>;
+
+export type UpdatePost = Partial<CreatePost>;
+export type UpdatePostChecked = Required<UpdatePost>;
 
 export interface IPostService {
-  getAll(): Promise<Post[]>;
-  getById(id: number): Promise<Post | undefined>;
-  create(data: CreatePostData): Promise<Post>;
-  update(id: number, data: UpdatePostData): Promise<Post>;
+  getAll(): Promise<PostWithTags[]>;
+  getById(id: number): Promise<PostWithTags | null>;
+  create(data: CreatePostChecked): Promise<Post>;
+  update(id: number, data: UpdatePostChecked): Promise<Post>;
+  delete(id: number): Promise<Post | null>;
 }
 
 export interface IPostController {
   getAll(req: Request, res: Response): Promise<void>;
-  getById(req: Request, res: Response): Promise<void>;
-  create(req: Request<{}, {}, CreatePostData>, res: Response): Promise<void>;
-  update(req: Request<{ id: string }, {}, UpdatePostData>, res: Response): Promise<void>;
+  getById(req: Request<{ id: string }>, res: Response): Promise<void>;
+  create(req: Request<{}, {}, CreatePost>, res: Response): Promise<void>;
+  update(req: Request<{ id: string }, {}, UpdatePost>, res: Response): Promise<void>;
+  delete(req: Request<{ id: string }>, res: Response): Promise<void>;
 }
