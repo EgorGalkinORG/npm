@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import prisma from "../generated/prisma";
 import { IPostService, CreatePostChecked, UpdatePostChecked } from "./post.types";
 
 const PostService: IPostService = {

@@ -23,8 +23,8 @@ export interface IPostService {
 
 export interface IPostController {
   getAll(req: Request, res: Response): Promise<void>;
-  getById(req: Request<{ id: string }>, res: Response): Promise<void>;
-  create(req: Request<{}, {}, CreatePost>, res: Response): Promise<void>;
-  update(req: Request<{ id: string }, {}, UpdatePost>, res: Response): Promise<void>;
-  delete(req: Request<{ id: string }>, res: Response): Promise<void>;
+  getById(req: Request, res: Response): Promise<void>;
+  create(req: Request<any, any, any>, res: Response): Promise<void>;
+  update(req: Request<any, any, any>, res: Response): Promise<void>;
+  delete(req: Request, res: Response): Promise<void>;
 }

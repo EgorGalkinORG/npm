@@ -1,5 +1,6 @@
-/package-lock.json
-/node_modules
+package-lock.json
+node_modules
 /src/generated/prisma
-/dev.db
+.env
+/prisma/db/
 /prisma/migrations/

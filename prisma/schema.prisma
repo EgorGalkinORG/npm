@@ -12,23 +12,19 @@ model Post {
   title       String
   description String
   image       String
-  createdAt   DateTime @default(now())
   tags        PostTag[]
 }
 
 model Tag {
   id    Int      @id @default(autoincrement())
-  name  String   @unique
+  name  String
   posts PostTag[]
 }
 
-// 🔗 Связующая таблица для связи many-to-many
 model PostTag {
   id     Int  @id @default(autoincrement())
   post   Post @relation(fields: [postId], references: [id])
   postId Int
   tag    Tag  @relation(fields: [tagId], references: [id])
   tagId  Int
-
-  @@unique([postId, tagId])
 }

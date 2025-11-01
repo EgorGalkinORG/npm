@@ -1,5 +1,5 @@
 import { IPostController } from "./post.types";
-import PostService from "./post.service";
+import PostService from "./service";
 
 const PostController: IPostController = {
   async getAll(req, res) {
@@ -11,7 +11,8 @@ const PostController: IPostController = {
     const id = Number(req.params.id);
     const post = await PostService.getById(id);
     if (!post) {
-      return res.status(404).json({ message: "Пост не найден" });
+      res.status(404).json({ message: "Пост не найден" });
+      return;
     }
     res.json(post);
   },
@@ -19,7 +20,8 @@ const PostController: IPostController = {
   async create(req, res) {
     const { title, description, image } = req.body;
     if (!title || !description || !image) {
-      return res.status(400).json({ message: "Заполните все поля" });
+      res.status(400).json({ message: "Заполните все поля" });
+      return;
     }
     const newPost = await PostService.create({ title, description, image });
     res.status(201).json(newPost);
@@ -41,7 +43,8 @@ const PostController: IPostController = {
     try {
       const deletedPost = await PostService.delete(id);
       if (!deletedPost) {
-        return res.status(404).json({ message: "Пост не найден" });
+        res.status(404).json({ message: "Пост не найден" });
+        return;
       }
       res.json(deletedPost);
     } catch {
