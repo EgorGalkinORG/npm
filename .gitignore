@@ -1,7 +1,8 @@
+node_modules/
 package-lock.json
-posts.json
-node_modules
-/src/generated/prisma
 .env
+.env.local
+.env.*
+/src/generated/prisma
 /prisma/db/
 /prisma/migrations/
