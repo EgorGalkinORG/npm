@@ -1,54 +1,24 @@
-import prisma from "../generated/prisma";
-import { IPostService, CreatePostChecked, UpdatePostChecked } from "./post.types";
+import { PostServiceContract, Post, PostWithTags, PostCreate, PostUpdate } from "./post.types";
+import { PostRepository } from "./repository";
 
-const PostService: IPostService = {
-  async getAll() {
-    try {
-      return await prisma.post.findMany({
-        include: { tags: { include: { tag: true } } },
-      });
-    } catch (error) {
-      throw error;
-    }
+export const PostService: PostServiceContract = {
+  getAll(take?: number): Promise<PostWithTags[]> {
+    return PostRepository.getAll(take);
   },
 
-  async getById(id) {
-    try {
-      return await prisma.post.findUnique({
-        where: { id },
-        include: { tags: { include: { tag: true } } },
-      });
-    } catch (error) {
-      throw error;
-    }
+  getById(id: number): Promise<PostWithTags | null> {
+    return PostRepository.getById(id);
   },
 
-  async create(data: CreatePostChecked) {
-    try {
-      return await prisma.post.create({ data });
-    } catch (error) {
-      throw error;
-    }
+  create(data: PostCreate): Promise<Post> {
+    return PostRepository.create(data);
   },
 
-  async update(id: number, data: UpdatePostChecked) {
-    try {
-      return await prisma.post.update({ where: { id }, data });
-    } catch (error) {
-      throw error;
-    }
+  update(id: number, data: PostUpdate): Promise<Post | null> {
+    return PostRepository.update(id, data);
   },
 
-  async delete(id: number) {
-    try {
-      return await prisma.post.delete({ where: { id } });
-    } catch (error: any) {
-      if (error.code === "P2025") {
-        return null;
-      }
-      throw error;
-    }
+  delete(id: number): Promise<Post | null> {
+    return PostRepository.delete(id);
   },
 };
-
-export default PostService;

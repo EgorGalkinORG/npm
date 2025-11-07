@@ -1,10 +1,10 @@
 import express from "express";
-import postRouter from "./Post/router";
+import { router } from "./Post/router";
 
 const app = express();
 
 app.use(express.json());
-app.use("/posts", postRouter);
+app.use("/posts", router);
 
 const PORT = 5000;
 app.listen(PORT, () => {
