@@ -12,11 +12,32 @@ app.use(cors({
 app.use(express.json());
 
 app.get('/posts', async (req, res) => {
-  res.json([]); 
+  const Posts = [
+    {
+      id: 1,
+      title: "Первый пост в FOROOMS",
+      description: "Добро пожаловать в наше приложение на React и Node.js!",
+      likes: 15,
+      tags: [{ tag: { id: 1, name: "React" } }]
+    },
+    {
+      id: 2,
+      title: "Работа с TypeScript",
+      description: "TS помогает избегать встреч с женским полом.",
+      likes: 24,
+      tags: [{ tag: { id: 2, name: "TypeScript" } }]
+    }
+  ];
+  res.json(Posts);
 });
 
 app.get('/tags', async (req, res) => {
-  res.json([]);
+  const Tags = [
+    { id: 1, name: "React" },
+    { id: 2, name: "TypeScript" },
+    { id: 3, name: "Backend" }
+  ];
+  res.json(Tags);
 });
 
 app.get('/posts/:postId', async (req, res) => {
